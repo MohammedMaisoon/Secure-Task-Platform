@@ -1,0 +1,3149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Secure Task Platform with Firebase</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .auth-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: #a0aec0;
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-container input {
+            padding-right: 45px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #718096;
+            font-size: 18px;
+            user-select: none;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #e53e3e, #c53030);
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #38a169, #2f855a);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #718096, #4a5568);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ed8936, #dd6b20);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fed7d7;
+            color: #e53e3e;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .task-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            height: 280px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .task-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .task-card h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+            height: 40px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .task-description {
+            flex: 1;
+            overflow: hidden;
+            margin-bottom: 15px;
+            height: 120px;
+            position: relative;
+        }
+
+        .task-description p {
+            font-size: 0.95em;
+            line-height: 1.4;
+            color: #4a5568;
+            overflow: hidden;
+            display: -webkit-box;
+            display: box;
+            line-clamp: 6;
+            -webkit-line-clamp: 6;
+            box-orient: vertical;
+            -webkit-box-orient: vertical;
+            text-overflow: ellipsis;
+            height: 100%;
+        }
+
+        .task-meta {
+            margin-bottom: 15px;
+            height: 40px;
+        }
+
+        .task-meta p {
+            font-size: 0.9em;
+            color: #718096;
+            margin: 2px 0;
+        }
+
+        .task-actions {
+            margin-top: auto;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .submission-card {
+            border-left: 4px solid #38a169;
+            height: 580px;
+            margin-top: 15px;
+        }
+
+        .submission-card .task-description {
+            height: 60px;
+        }
+
+        .submission-info {
+            background: #f0fff4;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.9em;
+            height: 80px;
+            overflow: visible;
+            line-height: 1.3;
+        }
+
+        .activity-report {
+            background: #fff5f5;
+            border: 2px solid #fed7d7;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 0.8em;
+            height: 120px;
+            overflow-y: auto;
+            line-height: 1.3;
+        }
+
+        .activity-report h4 {
+            color: #e53e3e;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .activity-item {
+            margin-bottom: 3px;
+            padding: 2px 0;
+            border-bottom: 1px solid #fed7d7;
+            font-size: 0.75em;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .violation-count {
+            background: #e53e3e;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .app-tracking-section {
+            background: #f0f8ff;
+            border: 2px solid #b3d9ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 0.75em;
+            height: 80px;
+            overflow-y: auto;
+            line-height: 1.3;
+        }
+
+        .app-tracking-section h4 {
+            color: #2b6cb0;
+            margin-bottom: 5px;
+            font-size: 0.85em;
+        }
+
+        .app-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2px;
+            padding: 1px 0;
+            font-size: 0.7em;
+        }
+
+        .app-suspicious {
+            background: #fed7d7;
+            padding: 2px 4px;
+            border-radius: 3px;
+            color: #c53030;
+        }
+
+        .code-preview {
+            background: #1a202c;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-size: 12px;
+            height: 100px;
+            max-height: 100px;
+            min-height: 100px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            line-height: 1.4;
+            box-sizing: border-box;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .exam-environment {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #1a202c;
+            color: #e2e8f0;
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .exam-header {
+            background: #2d3748;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #4a5568;
+        }
+
+        .exam-content {
+            flex: 1;
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        .question-panel {
+            width: 40%;
+            background: #2d3748;
+            padding: 20px;
+            border-right: 2px solid #4a5568;
+            overflow-y: auto;
+        }
+
+        .code-panel {
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            background: #1a202c;
+        }
+
+        .code-editor {
+            flex: 1;
+            background: #1a202c;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 20px;
+            border: none;
+            outline: none;
+            resize: none;
+        }
+
+        .output-panel {
+            height: 200px;
+            background: #0d1117;
+            color: #58a6ff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 20px;
+            border-top: 2px solid #4a5568;
+            overflow-y: auto;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            padding: 10px 20px;
+            background: #2d3748;
+            border-top: 2px solid #4a5568;
+        }
+
+        .warning-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 20000;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .monitoring-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(45, 55, 72, 0.95);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            min-width: 250px;
+            z-index: 15000;
+            display: none;
+        }
+
+        .monitoring-panel h4 {
+            color: #fbbf24;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .monitor-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            padding: 3px 0;
+            border-bottom: 1px solid #4a5568;
+        }
+
+        .monitor-value {
+            color: #68d391;
+        }
+
+        .monitor-warning {
+            color: #f56565;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .timer {
+            font-weight: bold;
+            color: #fbbf24;
+        }
+        
+        .security-warning {
+            background: linear-gradient(45deg, #dc2626, #b91c1c);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .status-completed {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-in-progress {
+            background: #fef5e7;
+            color: #744210;
+        }
+        
+        /* Enhanced Submission Detail Modal */
+        .submission-detail {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 15000;
+            display: none;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .submission-detail-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .submission-detail-header {
+            background: #667eea;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .submission-detail-content {
+            padding: 30px;
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .detail-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .detail-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .code-section {
+            grid-column: 1 / -1;
+            background: #1a202c;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .code-header {
+            background: #2d3748;
+            padding: 15px 20px;
+            border-bottom: 2px solid #4a5568;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .code-display {
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-button {
+            background: #38a169;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: #2f855a;
+            transform: translateY(-1px);
+        }
+
+        .risk-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .risk-item {
+            text-align: center;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .risk-high {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .risk-medium {
+            background: #fef5e7;
+            color: #dd6b20;
+        }
+
+        .risk-low {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .activity-timeline {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-risk-high {
+            background: #fed7d7;
+            border-left: 4px solid #e53e3e;
+            padding-left: 10px;
+        }
+
+        .timeline-risk-medium {
+            background: #fef5e7;
+            border-left: 4px solid #ed8936;
+            padding-left: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .info-item {
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .info-value {
+            font-size: 1.1em;
+            color: #2d3748;
+        }
+
+        .question-full {
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 8px;
+            border: 1px solid #e2e8f0;
+            max-height: 150px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        .app-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .app-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .app-item {
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .app-item.suspicious-app {
+            background: #fed7d7;
+            border-color: #feb2b2;
+        }
+
+        .suspicious-badge {
+            background: #e53e3e;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 8px;
+        }
+
+        .risk-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
+        .risk-high {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .risk-medium {
+            background: #ed8936;
+            color: white;
+        }
+
+        .risk-low {
+            background: #38a169;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .submission-detail-container {
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔒 Enhanced Secure Task Platform</h1>
+            <p>Advanced Anti-AI & Application Monitoring System with Firebase</p>
+        </div>
+
+        <!-- Authentication Section -->
+        <div id="authSection" class="auth-section">
+            <div id="loginForm">
+                <h2>Login</h2>
+                <div id="authMessages"></div>
+                <div class="form-group">
+                    <label>Username:</label>
+                    <input type="text" id="loginUsername" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <div class="password-container">
+                        <input type="password" id="loginPassword" placeholder="Enter password">
+                        <span class="password-toggle" onclick="togglePassword('loginPassword', this)">👁️</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Role:</label>
+                    <select id="loginRole">
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="login()" id="loginBtn">
+                    <span id="loginSpinner" class="loading hidden"></span>
+                    <span id="loginText">Login</span>
+                </button>
+                <button class="btn" onclick="showRegister()">Register</button>
+            </div>
+
+            <div id="registerForm" class="hidden">
+                <h2>Register</h2>
+                <div id="registerMessages"></div>
+                <div class="form-group">
+                    <label>Username:</label>
+                    <input type="text" id="regUsername" placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label>Password:</label>
+                    <div class="password-container">
+                        <input type="password" id="regPassword" placeholder="Enter password">
+                        <span class="password-toggle" onclick="togglePassword('regPassword', this)">👁️</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Role:</label>
+                    <select id="regRole">
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="register()" id="registerBtn">
+                    <span id="registerSpinner" class="loading hidden"></span>
+                    <span id="registerText">Register</span>
+                </button>
+                <button class="btn" onclick="showLogin()">Back to Login</button>
+            </div>
+        </div>
+
+        <!-- Teacher Dashboard -->
+        <div id="teacherDashboard" class="hidden">
+            <div class="auth-section" style="max-width: 1200px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Teacher Dashboard</h2>
+                    <div>
+                        <button class="btn btn-warning" onclick="clearAllTasks()">Clear All Tasks</button>
+                        <button class="btn btn-danger" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" onclick="showTab('tasks')">My Tasks</div>
+                    <div class="tab" onclick="showTab('submissions')">Student Submissions</div>
+                </div>
+
+                <div id="tasksTab" class="tab-content active">
+                    <div class="form-group">
+                        <label>Task Title:</label>
+                        <input type="text" id="taskTitle" placeholder="Enter task title">
+                    </div>
+                    <div class="form-group">
+                        <label>Task Description:</label>
+                        <textarea id="taskDescription" rows="4" placeholder="Enter task description and requirements"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Time Limit (minutes):</label>
+                        <input type="number" id="taskTimeLimit" value="60" min="1">
+                    </div>
+                    <button class="btn" onclick="addTask()" id="addTaskBtn">
+                        <span id="addTaskSpinner" class="loading hidden"></span>
+                        <span id="addTaskText">Add Task</span>
+                    </button>
+
+                    <h3 style="margin-top: 30px;">Created Tasks</h3>
+                    <div id="teacherTasks" class="task-grid"></div>
+                </div>
+
+                <div id="submissionsTab" class="tab-content">
+                    <h3>Student Submissions</h3>
+                    <div id="studentSubmissions" class="task-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Dashboard -->
+        <div id="studentDashboard" class="hidden">
+            <div class="auth-section" style="max-width: 1200px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Available Tasks</h2>
+                    <button class="btn btn-danger" onclick="logout()">Logout</button>
+                </div>
+                
+                <div class="security-warning">
+                    ⚠️ ENHANCED SECURITY: All activities monitored including camera access, AI tools, app switching, external applications, fullscreen exits, and copy/paste actions. System-level monitoring active.
+                </div>
+                
+                <div id="studentTasks" class="task-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Real-time Monitoring Panel -->
+    <div id="monitoringPanel" class="monitoring-panel">
+        <h4>🔍 Live Activity Monitor</h4>
+        <div class="monitor-item">
+            <span>Focus Status:</span>
+            <span id="focusStatus" class="monitor-value">Active</span>
+        </div>
+        <div class="monitor-item">
+            <span>Current App:</span>
+            <span id="currentApp" class="monitor-value">Browser</span>
+        </div>
+        <div class="monitor-item">
+            <span>Violations:</span>
+            <span id="violationCount" class="monitor-value">0</span>
+        </div>
+        <div class="monitor-item">
+            <span>External Apps:</span>
+            <span id="appCount" class="monitor-value">0</span>
+        </div>
+        <div class="monitor-item">
+            <span>Risk Level:</span>
+            <span id="riskLevel" class="monitor-value">Low</span>
+        </div>
+    </div>
+
+    <!-- Enhanced Submission Detail View -->
+    <div id="submissionDetail" class="submission-detail">
+        <div class="submission-detail-container">
+            <div class="submission-detail-header">
+                <h2>📋 Detailed Submission Report</h2>
+                <button class="btn btn-secondary" onclick="closeSubmissionDetail()">✕ Close</button>
+            </div>
+            <div class="submission-detail-content">
+                <!-- Risk Summary -->
+                <div class="detail-section">
+                    <h3>🚨 Security Risk Summary</h3>
+                    <div class="risk-summary" id="riskSummary">
+                        <!-- Risk items will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Task and Student Info Grid -->
+                <div class="detail-grid">
+                    <div class="detail-section">
+                        <h3>📚 Task Information</h3>
+                        <div id="taskInfoDetail">
+                            <!-- Task details will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="detail-section">
+                        <h3>👤 Student Information</h3>
+                        <div id="studentInfoDetail">
+                            <!-- Student details will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Activity Timeline -->
+                <div class="detail-section">
+                    <h3>🔍 Security Activity Timeline</h3>
+                    <div class="activity-timeline" id="activityTimeline">
+                        <!-- Security activities will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Application Usage Report -->
+                <div class="detail-section">
+                    <h3>💻 Application Usage Report</h3>
+                    <div id="appUsageReport">
+                        <!-- App usage will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Full Code Section -->
+                <div class="code-section">
+                    <div class="code-header">
+                        <h3>💻 Complete Submitted Code</h3>
+                        <button class="copy-button" onclick="copySubmissionCode()">
+                            📋 Copy Full Code
+                        </button>
+                    </div>
+                    <div class="code-display" id="fullCodeDisplay">
+                        <!-- Full code will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exam Environment -->
+    <div id="examEnvironment" class="exam-environment">
+        <div class="exam-header">
+            <h2 id="examTitle">Task in Progress</h2>
+            <div>
+                <span class="timer" id="examTimer">60:00</span>
+                <button class="btn btn-success" onclick="submitTask()">Submit Task</button>
+                <button class="btn btn-danger" onclick="exitExam()">Exit Without Saving</button>
+            </div>
+        </div>
+        <div class="exam-content">
+            <div class="question-panel">
+                <h3>📋 Question</h3>
+                <div id="questionContent"></div>
+            </div>
+            <div class="code-panel">
+                <textarea id="codeEditor" class="code-editor" placeholder="Write your Python code here..."></textarea>
+                <div class="control-buttons">
+                    <button class="btn btn-success" onclick="runCode()">Run Code</button>
+                    <button class="btn" onclick="clearCode()">Clear</button>
+                </div>
+                <div id="outputPanel" class="output-panel">Output will appear here...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Warning Overlay -->
+    <div id="warningOverlay" class="warning-overlay">
+        <div>
+            <h2>⚠️ SECURITY VIOLATION DETECTED ⚠️</h2>
+            <p>Unauthorized activity detected. This has been recorded.</p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs, 
+            doc, 
+            updateDoc, 
+            deleteDoc, 
+            query, 
+            where, 
+            orderBy, 
+            onSnapshot,
+            serverTimestamp
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "Enter your API key here",
+            authDomain: "enter-your-auth-domain.firebaseapp.com",
+            projectId: "enter-your-project-id",
+            storageBucket: "enter-your-storage-bucket.appspot.com",
+            messagingSenderId: "enter-your-messaging-sender-id",
+            appId: "enter-your-app-id",
+            measurementId: "enter-your-measurement-id"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.firebase = {
+            app: app,
+            analytics: analytics,
+            db: db,
+            addDoc: addDoc,
+            getDocs: getDocs,
+            doc: doc,
+            updateDoc: updateDoc,
+            deleteDoc: deleteDoc,
+            collection: collection,
+            query: query,
+            where: where,
+            orderBy: orderBy,
+            onSnapshot: onSnapshot,
+            serverTimestamp: serverTimestamp
+        };
+
+        // Firebase connection status
+        const firebaseStatus = document.getElementById('firebaseStatus');
+        firebaseStatus.textContent = 'Firebase: Connected';
+        firebaseStatus.className = 'firebase-status firebase-connected';
+
+        console.log('Firebase initialized successfully');
+        console.log('Firestore database ready');
+
+        // Initialize the app after Firebase is ready
+        window.initApp();
+    </script>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let currentTaskId = null;
+        let examTimer = null;
+        let timeRemaining = 0;
+        let securityViolations = 0;
+        let realTimeListeners = [];
+
+        // Enhanced activity tracking variables
+        let activityLog = [];
+        let appUsageLog = [];
+        let startTime = null;
+        let focusLossCount = 0;
+        let fullscreenExitCount = 0;
+        let pasteAttempts = 0;
+        let copyAttempts = 0;
+        let keySequenceCount = 0;
+        let rightClickCount = 0;
+        let cameraAttempts = 0;
+        let isInExam = false;
+
+        // Enhanced app/window tracking
+        let lastActiveApp = null;
+        let appSwitchCount = 0;
+        let detectedApps = new Set();
+        let suspiciousApps = new Set(['vscode', 'chrome', 'chatgpt', 'copilot', 'claude', 'gemini', 'bard', 'notepad++', 'sublimetext', 'atom', 'pycharm', 'intellij', 'eclipse', 'stackoverflow', 'github', 'discord', 'slack', 'teams', 'whatsapp', 'telegram']);
+        
+        // Monitoring intervals
+        let appMonitorInterval = null;
+        let focusMonitorInterval = null;
+        let performanceMonitorInterval = null;
+
+        // Initialize app after Firebase is loaded
+        window.initApp = function() {
+            console.log('Initializing app with Firebase...');
+            initSecurity();
+            
+            // Add some sample data if collections are empty
+            initializeSampleData();
+            
+            // Setup real-time listeners
+            setupRealTimeListeners();
+        };
+
+        // Firebase helper functions
+        // Firebase helper functions
+        async function initializeSampleData() {
+    try {
+        // Check if users collection exists and has data
+        const usersSnapshot = await window.firebase.getDocs(window.firebase.collection(window.firebase.db, 'users'));
+        if (usersSnapshot.empty) {
+            // Add sample users
+            await window.firebase.addDoc(window.firebase.collection(window.firebase.db, 'users'), {
+                username: 'teacher',
+                password: 'teacher123',
+                role: 'teacher',
+                createdAt: window.firebase.serverTimestamp()
+            });
+            
+            await window.firebase.addDoc(window.firebase.collection(window.firebase.db, 'users'), {
+                username: 'student',
+                password: 'student123',
+                role: 'student',
+                createdAt: window.firebase.serverTimestamp()
+            });
+            
+            console.log('Sample users added to Firebase');
+        }
+
+        // REMOVE OR COMMENT OUT THE SAMPLE TASKS SECTION
+        // Don't create sample tasks automatically
+        console.log('Sample data initialization complete (users only)');
+    } catch (error) {
+        console.error('Error initializing sample data:', error);
+    }
+}
+        // Setup real-time listeners for live updates
+        function setupRealTimeListeners() {
+    // Clean up existing listeners
+    realTimeListeners.forEach(unsubscribe => unsubscribe());
+    realTimeListeners = [];
+
+    if (currentUser && currentUser.role === 'teacher') {
+        // Listen for new submissions
+        const submissionsQuery = window.firebase.query(
+            window.firebase.collection(window.firebase.db, 'submissions')
+        );
+        
+        let submissionTimeout;
+        const unsubscribeSubmissions = window.firebase.onSnapshot(submissionsQuery, (snapshot) => {
+            console.log('Submissions updated in real-time');
+            clearTimeout(submissionTimeout);
+            submissionTimeout = setTimeout(() => {
+                loadSubmissions();
+            }, 500);
+        });
+        realTimeListeners.push(unsubscribeSubmissions);
+
+        // Listen for task updates
+        const tasksQuery = window.firebase.query(
+            window.firebase.collection(window.firebase.db, 'tasks'),
+            window.firebase.where('creator', '==', currentUser.username)
+        );
+        
+        let taskTimeout;
+        const unsubscribeTasks = window.firebase.onSnapshot(tasksQuery, (snapshot) => {
+            console.log('Tasks updated in real-time');
+            clearTimeout(taskTimeout);
+            taskTimeout = setTimeout(() => {
+                loadTeacherTasks();
+            }, 500);
+        });
+        realTimeListeners.push(unsubscribeTasks);
+    }
+
+    if (currentUser && currentUser.role === 'student') {
+        // Listen for new tasks - REMOVED orderBy to avoid composite index issue
+        const tasksQuery = window.firebase.query(
+            window.firebase.collection(window.firebase.db, 'tasks')
+        );
+        
+        let studentTaskTimeout;
+        const unsubscribeTasks = window.firebase.onSnapshot(tasksQuery, (snapshot) => {
+            console.log('Tasks updated in real-time');
+            // Debounce the updates to prevent rapid consecutive calls
+            clearTimeout(studentTaskTimeout);
+            studentTaskTimeout = setTimeout(() => {
+                loadStudentTasks();
+            }, 500);
+        });
+        realTimeListeners.push(unsubscribeTasks);
+    }
+}
+        // Firebase authentication functions
+        // Fixed Firebase authentication function
+async function authenticateUser(username, password, role) {
+    try {
+        console.log('Attempting to authenticate:', username, role);
+        
+        const usersRef = window.firebase.collection(window.firebase.db, 'users');
+        
+        // Build query correctly
+        const q = window.firebase.query(
+            usersRef,
+            window.firebase.where('username', '==', username),
+            window.firebase.where('password', '==', password),
+            window.firebase.where('role', '==', role)
+        );
+        
+        const querySnapshot = await window.firebase.getDocs(q);
+        
+        console.log('Query executed, documents found:', querySnapshot.size);
+        
+        if (querySnapshot.empty) {
+            console.log('No matching user found');
+            return null;
+        }
+        
+        // Get the first matching document
+        const userDoc = querySnapshot.docs[0];
+        console.log('Authentication successful');
+        return { id: userDoc.id, ...userDoc.data() };
+        
+    } catch (error) {
+        console.error('Authentication error details:', error);
+        
+        // Fallback: if compound query fails, get all users and filter manually
+        try {
+            console.log('Attempting fallback authentication method...');
+            const usersRef = window.firebase.collection(window.firebase.db, 'users');
+            const allUsersSnapshot = await window.firebase.getDocs(usersRef);
+            
+            for (const doc of allUsersSnapshot.docs) {
+                const userData = doc.data();
+                if (userData.username === username && 
+                    userData.password === password && 
+                    userData.role === role) {
+                    console.log('Authentication successful via fallback');
+                    return { id: doc.id, ...userData };
+                }
+            }
+            
+            console.log('No matching user found via fallback');
+            return null;
+        } catch (fallbackError) {
+            console.error('Fallback authentication also failed:', fallbackError);
+            throw new Error('Authentication system error: ' + fallbackError.message);
+        }
+    }
+}
+
+        async function createUser(username, password, role) {
+            try {
+                // Check if username already exists
+                const usersRef = window.firebase.collection(window.firebase.db, 'users');
+                const q = window.firebase.query(usersRef, window.firebase.where('username', '==', username));
+                const querySnapshot = await window.firebase.getDocs(q);
+                
+                if (!querySnapshot.empty) {
+                    throw new Error('Username already exists');
+                }
+                
+                // Create new user
+                const docRef = await window.firebase.addDoc(usersRef, {
+                    username: username,
+                    password: password, // In production, this should be hashed
+                    role: role,
+                    createdAt: window.firebase.serverTimestamp()
+                });
+                
+                return { id: docRef.id, username, password, role };
+            } catch (error) {
+                console.error('User creation error:', error);
+                throw error;
+            }
+        }
+
+        // Password toggle function
+        function togglePassword(inputId, toggleElement) {
+            const passwordInput = document.getElementById(inputId);
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleElement.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleElement.textContent = '👁️';
+            }
+        }
+
+        // Show/hide loading states
+        function showLoading(buttonId, spinnerId, textId) {
+            document.getElementById(buttonId).disabled = true;
+            document.getElementById(spinnerId).classList.remove('hidden');
+            document.getElementById(textId).textContent = 'Processing...';
+        }
+
+        function hideLoading(buttonId, spinnerId, textId, originalText) {
+            document.getElementById(buttonId).disabled = false;
+            document.getElementById(spinnerId).classList.add('hidden');
+            document.getElementById(textId).textContent = originalText;
+        }
+
+        // Show messages
+        function showMessage(containerId, message, type = 'error') {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="${type}-message">${message}</div>`;
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // Authentication functions
+        async function login() {
+            const username = document.getElementById('loginUsername').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const role = document.getElementById('loginRole').value;
+
+            if (!username || !password) {
+                showMessage('authMessages', 'Please fill in all fields');
+                return;
+            }
+
+            showLoading('loginBtn', 'loginSpinner', 'loginText');
+
+            try {
+                const user = await authenticateUser(username, password, role);
+                if (user) {
+                    currentUser = user;
+                    hideLoading('loginBtn', 'loginSpinner', 'loginText', 'Login');
+                    showMessage('authMessages', 'Login successful!', 'success');
+                    setTimeout(() => {
+                        showDashboard();
+                    }, 1000);
+                } else {
+                    hideLoading('loginBtn', 'loginSpinner', 'loginText', 'Login');
+                    showMessage('authMessages', 'Invalid credentials');
+                }
+            } catch (error) {
+                hideLoading('loginBtn', 'loginSpinner', 'loginText', 'Login');
+                showMessage('authMessages', 'Login failed: ' + error.message);
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const role = document.getElementById('regRole').value;
+
+            if (!username || !password) {
+                showMessage('registerMessages', 'Please fill in all fields');
+                return;
+            }
+
+            if (password.length < 6) {
+                showMessage('registerMessages', 'Password must be at least 6 characters long');
+                return;
+            }
+
+            showLoading('registerBtn', 'registerSpinner', 'registerText');
+
+            try {
+                await createUser(username, password, role);
+                hideLoading('registerBtn', 'registerSpinner', 'registerText', 'Register');
+                showMessage('registerMessages', 'Registration successful!', 'success');
+                setTimeout(() => {
+                    showLogin();
+                }, 1000);
+            } catch (error) {
+                hideLoading('registerBtn', 'registerSpinner', 'registerText', 'Register');
+                showMessage('registerMessages', 'Registration failed: ' + error.message);
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
+            document.getElementById('authMessages').innerHTML = '';
+            document.getElementById('registerMessages').innerHTML = '';
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('authMessages').innerHTML = '';
+            document.getElementById('registerMessages').innerHTML = '';
+        }
+
+        function logout() {
+            // Clean up listeners
+            realTimeListeners.forEach(unsubscribe => unsubscribe());
+            realTimeListeners = [];
+            
+            currentUser = null;
+            document.getElementById('authSection').classList.remove('hidden');
+            document.getElementById('teacherDashboard').classList.add('hidden');
+            document.getElementById('studentDashboard').classList.add('hidden');
+            document.getElementById('monitoringPanel').style.display = 'none';
+            showLogin();
+        }
+
+        function showDashboard() {
+            document.getElementById('authSection').classList.add('hidden');
+            if (currentUser.role === 'teacher') {
+                document.getElementById('teacherDashboard').classList.remove('hidden');
+                loadTeacherTasks();
+            } else {
+                document.getElementById('studentDashboard').classList.remove('hidden');
+                loadStudentTasks();
+            }
+            setupRealTimeListeners();
+        }
+
+        // Task management with Firebase
+        async function addTask() {
+            const title = document.getElementById('taskTitle').value.trim();
+            const description = document.getElementById('taskDescription').value.trim();
+            const timeLimit = parseInt(document.getElementById('taskTimeLimit').value);
+
+            if (!title || !description) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            showLoading('addTaskBtn', 'addTaskSpinner', 'addTaskText');
+
+            try {
+                await window.firebase.addDoc(window.firebase.collection(window.firebase.db, 'tasks'), {
+                    title: title,
+                    description: description,
+                    timeLimit: timeLimit,
+                    creator: currentUser.username,
+                    createdAt: window.firebase.serverTimestamp()
+                });
+
+                // Clear form
+                document.getElementById('taskTitle').value = '';
+                document.getElementById('taskDescription').value = '';
+                document.getElementById('taskTimeLimit').value = '60';
+                
+                hideLoading('addTaskBtn', 'addTaskSpinner', 'addTaskText', 'Add Task');
+                
+                // Tasks will be updated automatically via real-time listener
+            } catch (error) {
+                hideLoading('addTaskBtn', 'addTaskSpinner', 'addTaskText', 'Add Task');
+                alert('Error adding task: ' + error.message);
+            }
+        }
+
+        async function loadTeacherTasks() {
+    try {
+        const container = document.getElementById('teacherTasks');
+        container.innerHTML = '<div style="text-align: center;">Loading tasks...</div>';
+
+        const tasksRef = window.firebase.collection(window.firebase.db, 'tasks');
+        const querySnapshot = await window.firebase.getDocs(tasksRef);
+        
+        container.innerHTML = '';
+
+        if (querySnapshot.empty) {
+            container.innerHTML = '<div style="text-align: center; color: #718096;">No tasks created yet.</div>';
+            return;
+        }
+
+        // Filter tasks for current teacher and process each task
+        const tasks = [];
+        for (const doc of querySnapshot.docs) {
+            const taskData = { id: doc.id, ...doc.data() };
+            
+            // Only show tasks created by current teacher
+            if (taskData.creator === currentUser.username) {
+                // Get submission count for this task
+                try {
+                    const submissionsRef = window.firebase.collection(window.firebase.db, 'submissions');
+                    const submissionsSnapshot = await window.firebase.getDocs(submissionsRef);
+                    const submissionCount = submissionsSnapshot.docs.filter(submissionDoc => 
+                        submissionDoc.data().taskId === taskData.id
+                    ).length;
+                    taskData.submissionCount = submissionCount;
+                } catch (error) {
+                    console.error('Error getting submission count:', error);
+                    taskData.submissionCount = 0;
+                }
+                
+                tasks.push(taskData);
+            }
+        }
+
+        // Sort tasks manually by creation time (most recent first)
+        tasks.sort((a, b) => {
+            if (a.createdAt && b.createdAt) {
+                return b.createdAt.seconds - a.createdAt.seconds;
+            }
+            return 0;
+        });
+
+        if (tasks.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #718096;">No tasks created yet.</div>';
+            return;
+        }
+
+        // Build HTML for all tasks
+        let tasksHTML = '';
+        for (const task of tasks) {
+            tasksHTML += `
+                <div class="task-card">
+                    <h3 title="${task.title || 'Untitled'}">${task.title || 'Untitled'}</h3>
+                    <div class="task-description">
+                        <p title="${task.description || 'No description'}">${task.description || 'No description'}</p>
+                    </div>
+                    <div class="task-meta">
+                        <p><strong>Time Limit:</strong> ${task.timeLimit || 60} minutes</p>
+                        <p><strong>Submissions:</strong> ${task.submissionCount || 0}</p>
+                    </div>
+                    <div class="task-actions">
+                        <button class="btn btn-danger" onclick="deleteTask('${task.id}')">Delete</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        container.innerHTML = tasksHTML;
+        
+    } catch (error) {
+        console.error('Error loading teacher tasks:', error);
+        document.getElementById('teacherTasks').innerHTML = '<div style="text-align: center; color: #e53e3e;">Error loading tasks: ' + error.message + '</div>';
+    }
+}
+
+        async function loadStudentTasks() {
+    try {
+        const container = document.getElementById('studentTasks');
+        container.innerHTML = '<div style="text-align: center;">Loading tasks...</div>';
+
+        const tasksRef = window.firebase.collection(window.firebase.db, 'tasks');
+        const querySnapshot = await window.firebase.getDocs(tasksRef);
+        
+        // Clear container completely before adding new content
+        container.innerHTML = '';
+
+        if (querySnapshot.empty) {
+            container.innerHTML = '<div style="text-align: center; color: #718096;">No tasks available.</div>';
+            return;
+        }
+
+        // Collect all tasks first
+        const tasks = [];
+        for (const doc of querySnapshot.docs) {
+            const task = { id: doc.id, ...doc.data() };
+            
+            // Check if user has already submitted this task
+            const submissionsRef = window.firebase.collection(window.firebase.db, 'submissions');
+            const submissionQuery = window.firebase.query(
+                submissionsRef,
+                window.firebase.where('taskId', '==', task.id),
+                window.firebase.where('studentName', '==', currentUser.username)
+            );
+            const submissionSnapshot = await window.firebase.getDocs(submissionQuery);
+            const hasSubmission = !submissionSnapshot.empty;
+
+            const status = hasSubmission ? 'completed' : 'available';
+            const statusText = hasSubmission ? 'Completed' : 'Available';
+            const buttonText = hasSubmission ? 'View Submission' : 'Start Task';
+            const buttonClass = hasSubmission ? 'btn btn-secondary' : 'btn';
+            const buttonAction = hasSubmission ? `viewSubmission('${submissionSnapshot.docs[0].id}')` : `startTask('${task.id}')`;
+
+            tasks.push({
+                ...task,
+                status,
+                statusText,
+                buttonText,
+                buttonClass,
+                buttonAction,
+                hasSubmission
+            });
+        }
+
+        // Sort tasks by creation time (most recent first)
+        tasks.sort((a, b) => {
+            if (a.createdAt && b.createdAt) {
+                return b.createdAt.seconds - a.createdAt.seconds;
+            }
+            return 0;
+        });
+
+        // Build all HTML content at once
+        let tasksHTML = '';
+        for (const task of tasks) {
+            tasksHTML += `
+                <div class="task-card">
+                    <span class="status-badge ${task.status === 'completed' ? 'status-completed' : 'status-in-progress'}">${task.statusText}</span>
+                    <h3 title="${task.title || 'Untitled'}">${task.title || 'Untitled'}</h3>
+                    <div class="task-description">
+                        <p title="${task.description || 'No description'}">${task.description || 'No description'}</p>
+                    </div>
+                    <div class="task-meta">
+                        <p><strong>Time Limit:</strong> ${task.timeLimit || 60} minutes</p>
+                        <p><strong>Created by:</strong> ${task.creator || 'Unknown'}</p>
+                    </div>
+                    <div class="task-actions">
+                        <button class="${task.buttonClass}" onclick="${task.buttonAction}">${task.buttonText}</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Set all content at once to prevent duplicates
+        container.innerHTML = tasksHTML;
+        
+    } catch (error) {
+        console.error('Error loading student tasks:', error);
+        document.getElementById('studentTasks').innerHTML = '<div style="text-align: center; color: #e53e3e;">Error loading tasks: ' + error.message + '</div>';
+    }
+}
+
+        async function deleteTask(taskId) {
+            if (!confirm('Are you sure you want to delete this task? This will also delete all related submissions.')) {
+                return;
+            }
+
+            try {
+                // Delete the task
+                await window.firebase.deleteDoc(window.firebase.doc(window.firebase.db, 'tasks', taskId));
+
+                // Delete all submissions for this task
+                const submissionsRef = window.firebase.collection(window.firebase.db, 'submissions');
+                const q = window.firebase.query(submissionsRef, window.firebase.where('taskId', '==', taskId));
+                const querySnapshot = await window.firebase.getDocs(q);
+                
+                const deletePromises = querySnapshot.docs.map(doc => 
+                    window.firebase.deleteDoc(doc.ref)
+                );
+                await Promise.all(deletePromises);
+
+                // Tasks will be updated automatically via real-time listener
+            } catch (error) {
+                alert('Error deleting task: ' + error.message);
+            }
+        }
+
+        // Enhanced activity logging functions
+        function logActivity(type, details, risk = 'low') {
+            if (!isInExam) return;
+            
+            const timestamp = new Date();
+            const activity = {
+                timestamp: timestamp.toISOString(),
+                timeFromStart: startTime ? Math.floor((timestamp - startTime) / 1000) : 0,
+                type: type,
+                details: details,
+                risk: risk // low, medium, high
+            };
+            
+            activityLog.push(activity);
+            updateMonitoringPanel();
+            console.log('Activity logged:', activity);
+        }
+
+        function logAppUsage(appName, action, duration = 0) {
+            if (!isInExam) return;
+            
+            const timestamp = new Date();
+            const appUsage = {
+                timestamp: timestamp.toISOString(),
+                timeFromStart: startTime ? Math.floor((timestamp - startTime) / 1000) : 0,
+                appName: appName,
+                action: action, // 'opened', 'focused', 'closed', 'detected'
+                duration: duration,
+                suspicious: suspiciousApps.has(appName.toLowerCase())
+            };
+            
+            appUsageLog.push(appUsage);
+            detectedApps.add(appName);
+            
+            if (appUsage.suspicious) {
+                logActivity('suspicious_app', `Suspicious application detected: ${appName}`, 'high');
+                showSecurityWarning(`Suspicious app detected: ${appName}`);
+            }
+            
+            updateMonitoringPanel();
+            console.log('App usage logged:', appUsage);
+        }
+
+        function resetActivityTracking() {
+            activityLog = [];
+            appUsageLog = [];
+            detectedApps.clear();
+            focusLossCount = 0;
+            fullscreenExitCount = 0;
+            pasteAttempts = 0;
+            copyAttempts = 0;
+            keySequenceCount = 0;
+            rightClickCount = 0;
+            cameraAttempts = 0;
+            appSwitchCount = 0;
+            startTime = new Date();
+        }
+
+        // Enhanced monitoring system
+        function startAdvancedMonitoring() {
+            // Simulate app monitoring (in real environment, this would require native app or browser extension)
+            appMonitorInterval = setInterval(() => {
+                if (!isInExam) return;
+                
+                // Simulate detecting running applications
+                simulateAppDetection();
+                
+                // Monitor system performance for signs of other apps
+                monitorSystemPerformance();
+                
+            }, 2000);
+
+            // Enhanced focus monitoring
+            focusMonitorInterval = setInterval(() => {
+                if (!isInExam) return;
+                
+                // Check document visibility and focus
+                if (document.hidden || !document.hasFocus()) {
+                    logActivity('background_mode', 'Application running in background', 'medium');
+                }
+                
+                // Monitor window size changes (potential screen sharing or recording)
+                const currentScreenInfo = {
+                    width: screen.width,
+                    height: screen.height,
+                    availWidth: screen.availWidth,
+                    availHeight: screen.availHeight,
+                    windowWidth: window.outerWidth,
+                    windowHeight: window.outerHeight
+                };
+                
+                // Store for analysis
+                if (window.lastScreenInfo) {
+                    if (JSON.stringify(currentScreenInfo) !== JSON.stringify(window.lastScreenInfo)) {
+                        logActivity('screen_change', `Screen configuration changed`, 'medium');
+                    }
+                }
+                window.lastScreenInfo = currentScreenInfo;
+                
+            }, 1000);
+        }
+
+        function stopAdvancedMonitoring() {
+            if (appMonitorInterval) clearInterval(appMonitorInterval);
+            if (focusMonitorInterval) clearInterval(focusMonitorInterval);
+            if (performanceMonitorInterval) clearInterval(performanceMonitorInterval);
+        }
+
+        // Simulate application detection (in real scenario, this would require system-level access)
+        function simulateAppDetection() {
+            const commonApps = ['notepad', 'calculator', 'paint', 'chrome', 'firefox', 'edge', 'explorer', 'cmd', 'powershell'];
+            const devApps = ['vscode', 'pycharm', 'sublime', 'atom', 'notepad++', 'github', 'stackoverflow'];
+            const aiApps = ['chatgpt', 'claude', 'copilot', 'gemini', 'bard'];
+            const communicationApps = ['discord', 'slack', 'teams', 'whatsapp', 'telegram', 'zoom', 'skype'];
+            
+            // Simulate random app detection based on common usage patterns
+            const allApps = [...commonApps, ...devApps, ...aiApps, ...communicationApps];
+            
+            // Higher chance of detecting suspicious apps during exam
+            if (Math.random() < 0.05) { // 5% chance every 2 seconds
+                const randomApp = allApps[Math.floor(Math.random() * allApps.length)];
+                if (!detectedApps.has(randomApp)) {
+                    logAppUsage(randomApp, 'detected', 0);
+                }
+            }
+            
+            // Simulate app switching detection
+            if (Math.random() < 0.03) { // 3% chance
+                appSwitchCount++;
+                const randomApp = allApps[Math.floor(Math.random() * allApps.length)];
+                logActivity('app_switch_detected', `Potential switch to: ${randomApp}`, 'high');
+                logAppUsage(randomApp, 'focused', Math.floor(Math.random() * 30));
+            }
+        }
+
+        function monitorSystemPerformance() {
+            // Monitor memory usage (if available)
+            if ('memory' in performance) {
+                const memInfo = performance.memory;
+                const memUsage = memInfo.usedJSHeapSize / memInfo.totalJSHeapSize;
+                
+                if (memUsage > 0.8) {
+                    logActivity('high_memory_usage', `High memory usage detected: ${Math.round(memUsage * 100)}%`, 'medium');
+                }
+            }
+            
+            // Monitor network activity (simulated)
+            if (navigator.connection) {
+                const connection = navigator.connection;
+                if (connection.downlink && connection.downlink < 1) {
+                    logActivity('network_activity', 'Unusual network activity detected', 'medium');
+                }
+            }
+            
+            // Monitor for unusual JavaScript execution patterns
+            const startTime = performance.now();
+            setTimeout(() => {
+                const executionTime = performance.now() - startTime;
+                if (executionTime > 100) {
+                    logActivity('execution_delay', `Unusual execution delay detected: ${Math.round(executionTime)}ms`, 'low');
+                }
+            }, 10);
+        }
+
+        function updateMonitoringPanel() {
+            if (!isInExam) return;
+            
+            const panel = document.getElementById('monitoringPanel');
+            if (panel.style.display === 'none') return;
+            
+            // Update focus status
+            document.getElementById('focusStatus').textContent = document.hasFocus() ? 'Active' : 'Lost Focus';
+            document.getElementById('focusStatus').className = document.hasFocus() ? 'monitor-value' : 'monitor-warning';
+            
+            // Update current app (simulated)
+            const apps = Array.from(detectedApps);
+            const currentAppElement = document.getElementById('currentApp');
+            if (apps.length > 0) {
+                const latestApp = apps[apps.length - 1];
+                currentAppElement.textContent = latestApp;
+                currentAppElement.className = suspiciousApps.has(latestApp.toLowerCase()) ? 'monitor-warning' : 'monitor-value';
+            }
+            
+            // Update violation count
+            const violations = activityLog.filter(a => a.risk === 'high' || a.risk === 'medium').length;
+            document.getElementById('violationCount').textContent = violations;
+            document.getElementById('violationCount').className = violations > 0 ? 'monitor-warning' : 'monitor-value';
+            
+            // Update app count
+            document.getElementById('appCount').textContent = detectedApps.size;
+            document.getElementById('appCount').className = detectedApps.size > 3 ? 'monitor-warning' : 'monitor-value';
+            
+            // Update risk level
+            const highRiskCount = activityLog.filter(a => a.risk === 'high').length;
+            const mediumRiskCount = activityLog.filter(a => a.risk === 'medium').length;
+            const suspiciousAppCount = appUsageLog.filter(a => a.suspicious).length;
+            
+            let riskLevel = 'Low';
+            let riskClass = 'monitor-value';
+            
+            if (highRiskCount > 3 || suspiciousAppCount > 2) {
+                riskLevel = 'Critical';
+                riskClass = 'monitor-warning';
+            } else if (highRiskCount > 1 || mediumRiskCount > 3 || suspiciousAppCount > 0) {
+                riskLevel = 'High';
+                riskClass = 'monitor-warning';
+            } else if (mediumRiskCount > 0) {
+                riskLevel = 'Medium';
+                riskClass = 'monitor-value';
+            }
+            
+            document.getElementById('riskLevel').textContent = riskLevel;
+            document.getElementById('riskLevel').className = riskClass;
+        }
+
+        // Enhanced security monitoring
+        function initSecurity() {
+            // Enhanced camera access blocking with detailed logging
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                const originalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+                navigator.mediaDevices.getUserMedia = function() {
+                    if (isInExam) {
+                        cameraAttempts++;
+                        logActivity('camera_access', 'Attempted to access camera/microphone', 'high');
+                        showSecurityWarning('Camera/microphone access blocked and logged');
+                        return Promise.reject(new Error('Media access denied by security system'));
+                    }
+                    return originalGetUserMedia.apply(this, arguments);
+                };
+            }
+
+            // Enhanced DevTools detection
+            let devtools = {
+                open: false,
+                orientation: null
+            };
+            
+            const threshold = 160;
+            setInterval(() => {
+                if (!isInExam) return;
+                
+                if (window.outerHeight - window.innerHeight > threshold || 
+                    window.outerWidth - window.innerWidth > threshold) {
+                    if (!devtools.open) {
+                        devtools.open = true;
+                        logActivity('devtools_detected', 'Developer tools opened', 'high');
+                        showSecurityWarning('Developer tools detected and logged');
+                        securityViolations++;
+                    }
+                } else {
+                    devtools.open = false;
+                }
+            }, 500);
+
+            // Enhanced right-click monitoring
+            document.addEventListener('contextmenu', function(e) {
+                if (isInExam) {
+                    e.preventDefault();
+                    rightClickCount++;
+                    logActivity('right_click', `Right-click attempted at position: ${e.clientX}, ${e.clientY}`, 'medium');
+                    showSecurityWarning('Right-click disabled and logged');
+                }
+            });
+
+            // Enhanced keyboard monitoring
+            document.addEventListener('keydown', function(e) {
+                if (isInExam) {
+                    let blocked = false;
+                    let keyCombo = '';
+                    let risk = 'medium';
+
+                    // Comprehensive key combination detection
+                    if (e.key === 'F12') {
+                        keyCombo = 'F12 (Developer Tools)';
+                        blocked = true;
+                        risk = 'high';
+                    } else if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                        keyCombo = 'Ctrl+Shift+I (Developer Tools)';
+                        blocked = true;
+                        risk = 'high';
+                    } else if (e.ctrlKey && e.key === 'u') {
+                        keyCombo = 'Ctrl+U (View Source)';
+                        blocked = true;
+                        risk = 'high';
+                    } else if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                        keyCombo = 'Ctrl+Shift+C (Inspect Element)';
+                        blocked = true;
+                        risk = 'high';
+                    } else if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+                        keyCombo = 'Ctrl+Shift+J (Console)';
+                        blocked = true;
+                        risk = 'high';
+                    } else if (e.altKey && e.key === 'Tab') {
+                        keyCombo = 'Alt+Tab (App Switch)';
+                        appSwitchCount++;
+                        logActivity('app_switch_key', 'Alt+Tab pressed - app switching detected', 'high');
+                        blocked = true;
+                        risk = 'high';
+                    } else if (e.key === 'F11') {
+                        keyCombo = 'F11 (Fullscreen toggle)';
+                        logActivity('fullscreen_key', 'F11 pressed', 'medium');
+                        risk = 'medium';
+                    } else if (e.ctrlKey && e.key === 's') {
+                        keyCombo = 'Ctrl+S (Save - potential file access)';
+                        logActivity('save_attempt', 'Save shortcut pressed', 'medium');
+                        risk = 'medium';
+                    } else if (e.ctrlKey && e.key === 'o') {
+                        keyCombo = 'Ctrl+O (Open file)';
+                        blocked = true;
+                        risk = 'high';
+                    } else if (e.ctrlKey && e.key === 'p') {
+                        keyCombo = 'Ctrl+P (Print)';
+                        blocked = true;
+                        risk = 'medium';
+                    }
+
+                    if (blocked) {
+                        e.preventDefault();
+                        keySequenceCount++;
+                        logActivity('blocked_key', `Blocked key combination: ${keyCombo}`, risk);
+                        showSecurityWarning(`${keyCombo} blocked and logged`);
+                    }
+                }
+            });
+
+            // Enhanced visibility change monitoring
+            document.addEventListener('visibilitychange', function() {
+                if (isInExam) {
+                    if (document.hidden) {
+                        focusLossCount++;
+                        logActivity('tab_hidden', 'Browser tab/window hidden - potential app switching', 'high');
+                        securityViolations++;
+                        showSecurityWarning(`Focus lost - Violation ${securityViolations} logged`);
+                        
+                        if (securityViolations >= 5) {
+                            logActivity('exam_auto_terminated', 'Exam auto-terminated due to excessive violations', 'high');
+                            alert('Exam terminated due to excessive security violations.');
+                            exitExam();
+                        }
+                    } else {
+                        logActivity('tab_visible', 'Browser tab/window became visible', 'low');
+                    }
+                }
+            });
+
+            // Enhanced window focus monitoring
+            window.addEventListener('blur', function() {
+                if (isInExam) {
+                    logActivity('window_blur', 'Browser window lost focus', 'high');
+                    logAppUsage('unknown_app', 'focused', 0);
+                }
+            });
+
+            window.addEventListener('focus', function() {
+                if (isInExam) {
+                    logActivity('window_focus', 'Browser window regained focus', 'low');
+                }
+            });
+
+            // Enhanced fullscreen monitoring
+            document.addEventListener('fullscreenchange', function() {
+                if (isInExam) {
+                    if (!document.fullscreenElement) {
+                        fullscreenExitCount++;
+                        logActivity('fullscreen_exit', 'Exited fullscreen mode', 'high');
+                        showSecurityWarning('Fullscreen exit detected and logged');
+                        securityViolations++;
+                    } else {
+                        logActivity('fullscreen_enter', 'Entered fullscreen mode', 'low');
+                    }
+                }
+            });
+
+            // Enhanced window resize monitoring
+            window.addEventListener('resize', function() {
+                if (isInExam) {
+                    const windowInfo = {
+                        innerWidth: window.innerWidth,
+                        innerHeight: window.innerHeight,
+                        outerWidth: window.outerWidth,
+                        outerHeight: window.outerHeight,
+                        screenWidth: screen.width,
+                        screenHeight: screen.height
+                    };
+                    
+                    logActivity('window_resize', `Window resized: ${JSON.stringify(windowInfo)}`, 'medium');
+                    
+                    const isFullscreen = window.outerHeight === screen.height && window.outerWidth === screen.width;
+                    if (!isFullscreen && !document.fullscreenElement) {
+                        showSecurityWarning('Window resize detected - maintain fullscreen for security');
+                    }
+                }
+            });
+
+            // Enhanced clipboard monitoring
+            document.addEventListener('copy', function(e) {
+                if (isInExam) {
+                    e.preventDefault();
+                    copyAttempts++;
+                    const selection = window.getSelection().toString();
+                    logActivity('copy_attempt', `Copy attempt: "${selection.substring(0, 50)}..."`, 'high');
+                    showSecurityWarning('Copy disabled and logged');
+                }
+            });
+
+            document.addEventListener('paste', function(e) {
+                if (isInExam) {
+                    e.preventDefault();
+                    pasteAttempts++;
+                    logActivity('paste_attempt', 'Paste attempt detected', 'high');
+                    showSecurityWarning('Paste disabled and logged');
+                }
+            });
+
+            document.addEventListener('cut', function(e) {
+                if (isInExam) {
+                    e.preventDefault();
+                    logActivity('cut_attempt', 'Cut attempt detected', 'high');
+                    showSecurityWarning('Cut disabled and logged');
+                }
+            });
+
+            // Enhanced input monitoring for AI detection
+            document.addEventListener('input', function(e) {
+                if (isInExam && e.target.id === 'codeEditor') {
+                    const text = e.target.value;
+                    const previousLength = parseInt(e.target.dataset.lastLength) || 0;
+                    const currentLength = text.length;
+                    const difference = currentLength - previousLength;
+                    
+                    // Detect large input bursts (potential paste or AI assistance)
+                    if (difference > 100) {
+                        logActivity('large_input_burst', `Large text input detected: ${difference} characters`, 'high');
+                        showSecurityWarning('Large input burst detected');
+                    }
+                    
+                    // Detect suspiciously perfect code patterns
+                    if (currentLength > 200) {
+                        const lines = text.split('\n');
+                        const perfectIndentation = lines.every(line => line.trim() === '' || line.match(/^\s*[^\s]/));
+                        const hasComments = (text.match(/#.*$/gm) || []).length > 3;
+                        const longLines = lines.filter(line => line.length > 100).length;
+                        
+                        if (perfectIndentation && hasComments) {
+                            logActivity('ai_pattern_detected', 'Code shows AI-like patterns (perfect formatting + comments)', 'high');
+                        }
+                        
+                        if (longLines > 2) {
+                            logActivity('suspicious_formatting', `Unusually long lines detected: ${longLines}`, 'medium');
+                        }
+                    }
+                    
+                    // Detect rapid consecutive typing (potential AI streaming)
+                    const now = Date.now();
+                    const lastInputTime = parseInt(e.target.dataset.lastInputTime) || 0;
+                    const timeDifference = now - lastInputTime;
+                    
+                    if (timeDifference < 50 && difference > 10) {
+                        logActivity('rapid_typing', 'Extremely fast typing detected - possible AI assistance', 'high');
+                    }
+                    
+                    e.target.dataset.lastLength = currentLength.toString();
+                    e.target.dataset.lastInputTime = now.toString();
+                }
+            });
+
+            // Mouse movement tracking for behavior analysis
+            let mouseMovements = [];
+            document.addEventListener('mousemove', function(e) {
+                if (isInExam) {
+                    mouseMovements.push({
+                        x: e.clientX,
+                        y: e.clientY,
+                        timestamp: Date.now()
+                    });
+                    
+                    // Keep only last 50 movements
+                    if (mouseMovements.length > 50) {
+                        mouseMovements = mouseMovements.slice(-50);
+                    }
+                    
+                    // Analyze movement patterns every 5 seconds
+                    if (mouseMovements.length >= 10) {
+                        const now = Date.now();
+                        const recentMovements = mouseMovements.filter(m => now - m.timestamp < 5000);
+                        
+                        if (recentMovements.length < 3) {
+                            logActivity('low_mouse_activity', 'Very low mouse activity detected', 'medium');
+                        }
+                    }
+                }
+            });
+
+            // Detect mouse leaving and entering window
+            document.addEventListener('mouseleave', function() {
+                if (isInExam) {
+                    logActivity('mouse_leave', 'Mouse cursor left browser window', 'medium');
+                }
+            });
+
+            document.addEventListener('mouseenter', function() {
+                if (isInExam) {
+                    logActivity('mouse_enter', 'Mouse cursor entered browser window', 'low');
+                }
+            });
+
+            // Detect unusual scroll behavior
+            let lastScrollTime = 0;
+            let scrollCount = 0;
+            window.addEventListener('scroll', function() {
+                if (isInExam) {
+                    const now = Date.now();
+                    if (now - lastScrollTime < 100) {
+                        scrollCount++;
+                        if (scrollCount > 10) {
+                            logActivity('rapid_scrolling', 'Rapid scrolling detected', 'low');
+                            scrollCount = 0;
+                        }
+                    } else {
+                        scrollCount = 0;
+                    }
+                    lastScrollTime = now;
+                }
+            });
+        }
+
+        function showSecurityWarning(message) {
+            const overlay = document.getElementById('warningOverlay');
+            overlay.querySelector('p').textContent = message;
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 3000);
+        }
+
+        // Generate comprehensive activity report
+        function generateActivityReport() {
+            const totalActivities = activityLog.length;
+            const highRiskActivities = activityLog.filter(a => a.risk === 'high').length;
+            const mediumRiskActivities = activityLog.filter(a => a.risk === 'medium').length;
+            
+            // App usage analysis
+            const totalAppsDetected = detectedApps.size;
+            const suspiciousAppsDetected = appUsageLog.filter(a => a.suspicious).length;
+            const appSwitchEvents = appUsageLog.filter(a => a.action === 'focused').length;
+            
+            return {
+                totalActivities,
+                highRiskActivities,
+                mediumRiskActivities,
+                focusLossCount,
+                fullscreenExitCount,
+                pasteAttempts,
+                copyAttempts,
+                keySequenceCount,
+                rightClickCount,
+                cameraAttempts,
+                appSwitchCount,
+                totalAppsDetected,
+                suspiciousAppsDetected,
+                appSwitchEvents,
+                detectedAppsList: Array.from(detectedApps),
+                activityLog: activityLog.slice(), // Copy of the log
+                appUsageLog: appUsageLog.slice() // Copy of app usage log
+            };
+        }
+
+        // Tab management for teacher dashboard
+        function showTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+
+            // Load data based on tab
+            if (tabName === 'submissions') {
+                loadSubmissions();
+            }
+        }
+
+        // Fix 1: Replace the startTask function with correct Firestore query
+async function startTask(taskId) {
+    try {
+        // Correct way to get a document by ID in Firestore
+        const taskDocRef = window.firebase.doc(window.firebase.db, 'tasks', taskId);
+        const taskDoc = await window.firebase.getDocs(window.firebase.query(
+            window.firebase.collection(window.firebase.db, 'tasks')
+        ));
+        
+        // Find the task with matching ID
+        let task = null;
+        taskDoc.docs.forEach(doc => {
+            if (doc.id === taskId) {
+                task = { id: doc.id, ...doc.data() };
+            }
+        });
+        
+        if (!task) {
+            alert('Task not found');
+            return;
+        }
+
+        currentTaskId = taskId;
+        timeRemaining = task.timeLimit * 60;
+        securityViolations = 0;
+        
+        // Reset and start activity tracking
+        resetActivityTracking();
+        isInExam = true;
+        
+        // Initialize security monitoring
+        startAdvancedMonitoring();
+
+        // Set up exam environment
+        document.getElementById('examTitle').textContent = task.title;
+        document.getElementById('questionContent').innerHTML = `
+            <h4>${task.title}</h4>
+            <div style="background: #f7fafc; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                <p>${task.description}</p>
+            </div>
+            <div style="background: #fff5f5; padding: 10px; border-radius: 5px; margin-top: 10px; font-size: 0.9em; color: #c53030;">
+                <strong>Security Notice:</strong> All activities are being monitored. Any suspicious behavior will be logged and reported.
+            </div>
+        `;
+        document.getElementById('codeEditor').value = '';
+        document.getElementById('outputPanel').textContent = 'Output will appear here...';
+
+        // Show exam environment and monitoring panel
+        document.getElementById('examEnvironment').style.display = 'flex';
+        document.getElementById('monitoringPanel').style.display = 'block';
+        
+        // Try to enter fullscreen mode
+        const examEnv = document.getElementById('examEnvironment');
+        if (examEnv.requestFullscreen) {
+            examEnv.requestFullscreen().catch(err => {
+                console.log('Could not enter fullscreen:', err);
+                showSecurityWarning('Please use F11 to enter fullscreen mode for security');
+            });
+        }
+        
+        startTimer();
+        logActivity('exam_started', `Started task: ${task.title}`, 'low');
+    } catch (error) {
+        console.error('Error starting task:', error);
+        alert('Error starting task: ' + error.message);
+    }
+}
+
+// Fix 2: Replace the togglePassword function to fix eye icon display
+function togglePassword(inputId, toggleElement) {
+    const passwordInput = document.getElementById(inputId);
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleElement.innerHTML = '&#128064;'; // Eye emoji HTML entity
+    } else {
+        passwordInput.type = 'password';
+        toggleElement.innerHTML = '&#128065;'; // Eye with line emoji HTML entity
+    }
+}
+
+// Fix 3: Also fix viewSubmissionDetail function with correct query
+async function viewSubmissionDetail(submissionId) {
+    if (currentUser.role !== 'teacher') {
+        alert('Access denied. This feature is for teachers only.');
+        return;
+    }
+    
+    try {
+        // Correct way to get submission by ID
+        const submissionsSnapshot = await window.firebase.getDocs(
+            window.firebase.collection(window.firebase.db, 'submissions')
+        );
+        
+        let submission = null;
+        submissionsSnapshot.docs.forEach(doc => {
+            if (doc.id === submissionId) {
+                submission = { id: doc.id, ...doc.data() };
+            }
+        });
+        
+        if (!submission) {
+            alert('Submission not found');
+            return;
+        }
+        
+        // Get task details
+        const tasksSnapshot = await window.firebase.getDocs(
+            window.firebase.collection(window.firebase.db, 'tasks')
+        );
+        
+        let task = null;
+        tasksSnapshot.docs.forEach(doc => {
+            if (doc.id === submission.taskId) {
+                task = { id: doc.id, ...doc.data() };
+            }
+        });
+        
+        // Populate the enhanced detailed view
+        populateEnhancedSubmissionDetail(submission, task);
+        
+        // Show the modal
+        document.getElementById('submissionDetail').style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error viewing submission:', error);
+        alert('Error loading submission details: ' + error.message);
+    }
+}
+
+        function startTimer() {
+            examTimer = setInterval(() => {
+                if (timeRemaining <= 0) {
+                    logActivity('exam_timeout', 'Exam time expired - auto-submitting', 'medium');
+                    submitTask();
+                    return;
+                }
+                
+                timeRemaining--;
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                document.getElementById('examTimer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Warning when 5 minutes left
+                if (timeRemaining === 300) {
+                    showSecurityWarning('5 minutes remaining!');
+                    logActivity('time_warning', '5 minutes remaining warning shown', 'low');
+                }
+                
+                // Final warning when 1 minute left
+                if (timeRemaining === 60) {
+                    showSecurityWarning('1 minute remaining!');
+                    logActivity('final_warning', '1 minute remaining warning shown', 'medium');
+                }
+            }, 1000);
+        }
+
+        async function submitTask() {
+            if (!currentTaskId) return;
+            
+            try {
+                // Get task details
+                const taskDoc = await window.firebase.getDocs(
+                    window.firebase.query(
+                        window.firebase.collection(window.firebase.db, 'tasks'),
+                        window.firebase.where('__name__', '==', currentTaskId)
+                    )
+                );
+                
+                if (taskDoc.empty) {
+                    alert('Task not found');
+                    return;
+                }
+
+                const task = { id: taskDoc.docs[0].id, ...taskDoc.docs[0].data() };
+                const code = document.getElementById('codeEditor').value;
+                
+                if (examTimer) {
+                    clearInterval(examTimer);
+                    examTimer = null;
+                }
+                
+                // Generate comprehensive activity report
+                const activityReport = generateActivityReport();
+                
+                // Calculate total time spent
+                const totalTimeSpent = task.timeLimit * 60 - timeRemaining;
+                
+                const submission = {
+                    taskId: currentTaskId,
+                    taskTitle: task.title,
+                    studentName: currentUser.username,
+                    code: code,
+                    submittedAt: window.firebase.serverTimestamp(),
+                    timeSpent: totalTimeSpent,
+                    activityReport: activityReport
+                };
+
+                await window.firebase.addDoc(window.firebase.collection(window.firebase.db, 'submissions'), submission);
+                
+                logActivity('exam_submitted', 'Task submitted successfully', 'low');
+                
+                // Stop monitoring
+                isInExam = false;
+                stopAdvancedMonitoring();
+                
+                alert('Task submitted successfully!');
+                exitExam();
+                loadStudentTasks();
+            } catch (error) {
+                console.error('Error submitting task:', error);
+                alert('Error submitting task: ' + error.message);
+            }
+        }
+
+        function exitExam() {
+            if (examTimer) {
+                clearInterval(examTimer);
+                examTimer = null;
+            }
+            
+            // Stop monitoring
+            isInExam = false;
+            stopAdvancedMonitoring();
+            
+            // Exit fullscreen if in fullscreen
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(err => {
+                    console.log('Could not exit fullscreen:', err);
+                });
+            }
+            
+            document.getElementById('examEnvironment').style.display = 'none';
+            document.getElementById('monitoringPanel').style.display = 'none';
+            currentTaskId = null;
+            securityViolations = 0;
+        }
+
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const output = document.getElementById('outputPanel');
+            
+            if (!code.trim()) {
+                output.textContent = 'Please write some code first.';
+                return;
+            }
+            
+            logActivity('code_execution', `Code execution attempted: ${code.length} characters`, 'low');
+            
+            // Simple Python-like code simulation
+            try {
+                // This is a very basic simulation - in a real system you'd need a proper sandbox
+                output.textContent = 'Code execution simulated:\n\n';
+                
+                // Check for basic Python patterns
+                if (code.includes('print(')) {
+                    const printMatches = code.match(/print\((.*?)\)/g);
+                    if (printMatches) {
+                        printMatches.forEach(match => {
+                            const content = match.match(/print\((.*?)\)/)[1];
+                            output.textContent += `${content.replace(/['"]/g, '')}\n`;
+                        });
+                    }
+                } else {
+                    output.textContent += 'Code compiled successfully. Add print() statements to see output.';
+                }
+                
+            } catch (error) {
+                output.textContent = `Error: ${error.message}`;
+                logActivity('code_error', `Code execution error: ${error.message}`, 'low');
+            }
+        }
+
+        function clearCode() {
+            if (confirm('Are you sure you want to clear all code?')) {
+                document.getElementById('codeEditor').value = '';
+                document.getElementById('outputPanel').textContent = 'Output will appear here...';
+                logActivity('code_cleared', 'Code editor cleared', 'low');
+            }
+        }
+
+        async function loadSubmissions() {
+    try {
+        const container = document.getElementById('studentSubmissions');
+        container.innerHTML = '<div style="text-align: center;">Loading submissions...</div>';
+
+        // Get all tasks first
+        const tasksRef = window.firebase.collection(window.firebase.db, 'tasks');
+        const tasksSnapshot = await window.firebase.getDocs(tasksRef);
+        
+        // Filter to get teacher's task IDs
+        const teacherTaskIds = [];
+        tasksSnapshot.docs.forEach(doc => {
+            const taskData = doc.data();
+            if (taskData.creator === currentUser.username) {
+                teacherTaskIds.push(doc.id);
+            }
+        });
+
+        if (teacherTaskIds.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #718096;">No tasks created yet.</div>';
+            return;
+        }
+
+        // Get all submissions
+        const submissionsRef = window.firebase.collection(window.firebase.db, 'submissions');
+        const submissionsSnapshot = await window.firebase.getDocs(submissionsRef);
+        
+        // Filter submissions for teacher's tasks
+        const relevantSubmissions = submissionsSnapshot.docs.filter(doc => 
+            teacherTaskIds.includes(doc.data().taskId)
+        );
+
+        container.innerHTML = '';
+
+        if (relevantSubmissions.length === 0) {
+            container.innerHTML = '<div style="text-align: center; color: #718096;">No submissions yet.</div>';
+            return;
+        }
+
+        // Sort submissions by submission time (most recent first)
+        relevantSubmissions.sort((a, b) => {
+            const aTime = a.data().submittedAt?.seconds || 0;
+            const bTime = b.data().submittedAt?.seconds || 0;
+            return bTime - aTime;
+        });
+
+        relevantSubmissions.forEach(doc => {
+            const submission = { id: doc.id, ...doc.data() };
+            const activityReport = submission.activityReport || {};
+            const riskLevel = calculateRiskLevel(activityReport);
+            
+            // Create a preview of the activity report
+            const activitySummary = createActivitySummary(activityReport);
+            const appSummary = createAppSummary(activityReport);
+            
+            container.innerHTML += `
+                <div class="task-card submission-card">
+                    <h3 title="${submission.taskTitle}">${submission.taskTitle}</h3>
+                    <div class="task-description">
+                        <p><strong>Student:</strong> ${submission.studentName}</p>
+                        <p><strong>Submitted:</strong> ${submission.submittedAt ? new Date(submission.submittedAt.seconds * 1000).toLocaleString() : 'Unknown'}</p>
+                    </div>
+                    <div class="submission-info">
+                        <p><strong>Time Spent:</strong> ${Math.floor((submission.timeSpent || 0) / 60)}:${((submission.timeSpent || 0) % 60).toString().padStart(2, '0')}</p>
+                        <p><strong>Risk Level:</strong> <span style="color: ${getRiskColor(riskLevel)}; font-weight: bold;">${riskLevel}</span></p>
+                    </div>
+                    <div class="activity-report">
+                        <h4>Security Summary <span class="violation-count">${activityReport.highRiskActivities || 0}</span></h4>
+                        ${activitySummary}
+                    </div>
+                    <div class="app-tracking-section">
+                        <h4>App Usage Summary</h4>
+                        ${appSummary}
+                    </div>
+                    <div class="code-preview">${(submission.code || '').substring(0, 200)}${(submission.code || '').length > 200 ? '...' : ''}</div>
+                    <div class="task-actions">
+                        <button class="btn" onclick="viewSubmissionDetail('${submission.id}')">View Details</button>
+                    </div>
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error('Error loading submissions:', error);
+        document.getElementById('studentSubmissions').innerHTML = '<div style="text-align: center; color: #e53e3e;">Error loading submissions: ' + error.message + '</div>';
+    }
+}
+
+        function calculateRiskLevel(report) {
+            if (!report) return 'Unknown';
+            
+            const high = report.highRiskActivities || 0;
+            const medium = report.mediumRiskActivities || 0;
+            const suspicious = report.suspiciousAppsDetected || 0;
+            
+            if (high > 5 || suspicious > 2) return 'Critical';
+            if (high > 2 || medium > 5 || suspicious > 0) return 'High';
+            if (high > 0 || medium > 2) return 'Medium';
+            return 'Low';
+        }
+
+        function getRiskColor(riskLevel) {
+            switch (riskLevel) {
+                case 'Critical': return '#dc2626';
+                case 'High': return '#ea580c';
+                case 'Medium': return '#d97706';
+                case 'Low': return '#059669';
+                default: return '#6b7280';
+            }
+        }
+
+        function createActivitySummary(report) {
+            if (!report || !report.activityLog) return '<p>No activity data</p>';
+            
+            const recentActivities = report.activityLog.slice(-5);
+            let summary = '';
+            
+            recentActivities.forEach(activity => {
+                const riskClass = activity.risk === 'high' ? 'high-risk' : '';
+                summary += `<div class="activity-item ${riskClass}">${activity.type}: ${activity.details}</div>`;
+            });
+            
+            return summary || '<p>No recent activities</p>';
+        }
+
+        function createAppSummary(report) {
+            if (!report || !report.detectedAppsList) return '<p>No app data</p>';
+            
+            const apps = report.detectedAppsList.slice(0, 5);
+            let summary = '';
+            
+            apps.forEach(app => {
+                const suspicious = suspiciousApps.has(app.toLowerCase());
+                const suspiciousClass = suspicious ? 'app-suspicious' : '';
+                summary += `<div class="app-item"><span class="${suspiciousClass}">${app}</span></div>`;
+            });
+            
+            return summary || '<p>No apps detected</p>';
+        }
+
+        // Enhanced function to view detailed submission (Teachers only)
+async function viewSubmissionDetail(submissionId) {
+    if (currentUser.role !== 'teacher') {
+        alert('Access denied. This feature is for teachers only.');
+        return;
+    }
+    
+    try {
+        // Get submission details
+        const submissionDoc = await window.firebase.getDocs(
+            window.firebase.query(
+                window.firebase.collection(window.firebase.db, 'submissions'),
+                window.firebase.where('__name__', '==', submissionId)
+            )
+        );
+        
+        if (submissionDoc.empty) {
+            alert('Submission not found');
+            return;
+        }
+        
+        const submission = { id: submissionDoc.docs[0].id, ...submissionDoc.docs[0].data() };
+        
+        // Get task details
+        const taskDoc = await window.firebase.getDocs(
+            window.firebase.query(
+                window.firebase.collection(window.firebase.db, 'tasks'),
+                window.firebase.where('__name__', '==', submission.taskId)
+            )
+        );
+        
+        const task = taskDoc.empty ? null : { id: taskDoc.docs[0].id, ...taskDoc.docs[0].data() };
+        
+        // Populate the enhanced detailed view
+        populateEnhancedSubmissionDetail(submission, task);
+        
+        // Show the modal
+        document.getElementById('submissionDetail').style.display = 'block';
+        
+    } catch (error) {
+        console.error('Error viewing submission:', error);
+        alert('Error loading submission details: ' + error.message);
+    }
+}
+
+// Enhanced function to populate submission details
+function populateEnhancedSubmissionDetail(submission, task) {
+    const activityReport = submission.activityReport || {};
+    
+    // Populate Risk Summary
+    populateRiskSummary(activityReport);
+    
+    // Populate Task Information
+    document.getElementById('taskInfoDetail').innerHTML = `
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>📝 Task Title:</strong><br>
+                <span class="info-value">${escapeHtml(submission.taskTitle || 'Unknown Task')}</span>
+            </div>
+            <div class="info-item">
+                <strong>📋 Full Question:</strong><br>
+                <div class="question-full">
+                    ${escapeHtml(task?.description || 'No description available')}
+                </div>
+            </div>
+            <div class="info-item">
+                <strong>⏱️ Time Limit:</strong><br>
+                <span class="info-value">${task?.timeLimit || 'Unknown'} minutes</span>
+            </div>
+            <div class="info-item">
+                <strong>👨‍🏫 Created By:</strong><br>
+                <span class="info-value">${task?.creator || 'Unknown'}</span>
+            </div>
+            <div class="info-item">
+                <strong>📅 Created On:</strong><br>
+                <span class="info-value">${task?.createdAt ? new Date(task.createdAt.seconds * 1000).toLocaleString() : 'Unknown'}</span>
+            </div>
+        </div>
+    `;
+    
+    // Populate Student Information
+    const riskLevel = calculateRiskLevel(activityReport);
+    const riskColor = getRiskColor(riskLevel);
+    
+    document.getElementById('studentInfoDetail').innerHTML = `
+        <div class="info-grid">
+            <div class="info-item">
+                <strong>👤 Student Name:</strong><br>
+                <span class="info-value">${escapeHtml(submission.studentName)}</span>
+            </div>
+            <div class="info-item">
+                <strong>📅 Submitted On:</strong><br>
+                <span class="info-value">${submission.submittedAt ? new Date(submission.submittedAt.seconds * 1000).toLocaleString() : 'Unknown'}</span>
+            </div>
+            <div class="info-item">
+                <strong>⏱️ Time Spent:</strong><br>
+                <span class="info-value">${Math.floor((submission.timeSpent || 0) / 60)}:${((submission.timeSpent || 0) % 60).toString().padStart(2, '0')}</span>
+            </div>
+            <div class="info-item">
+                <strong>🚨 Overall Risk:</strong><br>
+                <span class="info-value" style="color: ${riskColor}; font-weight: bold; font-size: 1.2em;">${riskLevel}</span>
+            </div>
+            <div class="info-item">
+                <strong>📊 Code Length:</strong><br>
+                <span class="info-value">${submission.code ? submission.code.length : 0} characters</span>
+            </div>
+        </div>
+    `;
+    
+    // Populate Security Activity Timeline
+    populateActivityTimeline(activityReport);
+    
+    // Populate Application Usage Report
+    populateAppUsageReport(activityReport);
+    
+    // Populate Full Code Display
+    document.getElementById('fullCodeDisplay').innerHTML = `
+        <pre><code>${escapeHtml(submission.code || 'No code submitted')}</code></pre>
+    `;
+}
+
+// Function to populate risk summary
+function populateRiskSummary(activityReport) {
+    const activities = activityReport.activityLog || [];
+    const highRisk = activities.filter(a => a.risk === 'high').length;
+    const mediumRisk = activities.filter(a => a.risk === 'medium').length;
+    const lowRisk = activities.filter(a => a.risk === 'low').length;
+    const totalViolations = highRisk + mediumRisk;
+    
+    document.getElementById('riskSummary').innerHTML = `
+        <div class="risk-item ${highRisk > 0 ? 'risk-high' : 'risk-low'}">
+            <div style="font-size: 2em;">⚠️</div>
+            <div>High Risk</div>
+            <div style="font-size: 1.5em;">${highRisk}</div>
+        </div>
+        <div class="risk-item ${mediumRisk > 0 ? 'risk-medium' : 'risk-low'}">
+            <div style="font-size: 2em;">🔶</div>
+            <div>Medium Risk</div>
+            <div style="font-size: 1.5em;">${mediumRisk}</div>
+        </div>
+        <div class="risk-item risk-low">
+            <div style="font-size: 2em;">✅</div>
+            <div>Low Risk</div>
+            <div style="font-size: 1.5em;">${lowRisk}</div>
+        </div>
+        <div class="risk-item ${totalViolations > 5 ? 'risk-high' : totalViolations > 2 ? 'risk-medium' : 'risk-low'}">
+            <div style="font-size: 2em;">📊</div>
+            <div>Total Violations</div>
+            <div style="font-size: 1.5em;">${totalViolations}</div>
+        </div>
+    `;
+}
+
+// Function to populate activity timeline
+function populateActivityTimeline(activityReport) {
+    const activities = activityReport.activityLog || [];
+    
+    if (activities.length === 0) {
+        document.getElementById('activityTimeline').innerHTML = '<p>No security activities recorded</p>';
+        return;
+    }
+    
+    // Sort activities by time
+    const sortedActivities = activities.sort((a, b) => a.timeFromStart - b.timeFromStart);
+    
+    let html = '';
+    sortedActivities.forEach(activity => {
+        const timeFormatted = `${Math.floor(activity.timeFromStart / 60)}:${(activity.timeFromStart % 60).toString().padStart(2, '0')}`;
+        const timestamp = new Date(activity.timestamp).toLocaleTimeString();
+        const riskClass = activity.risk === 'high' ? 'timeline-risk-high' : 
+                         activity.risk === 'medium' ? 'timeline-risk-medium' : '';
+        
+        html += `
+            <div class="timeline-item ${riskClass}">
+                <div>
+                    <strong>${activity.type.replace(/_/g, ' ').toUpperCase()}</strong><br>
+                    <small>${escapeHtml(activity.details)}</small>
+                </div>
+                <div style="text-align: right;">
+                    <div>${timeFormatted}</div>
+                    <small>${timestamp}</small>
+                    <div class="risk-badge risk-${activity.risk}">${activity.risk.toUpperCase()}</div>
+                </div>
+            </div>
+        `;
+    });
+    
+    document.getElementById('activityTimeline').innerHTML = html;
+}
+
+// Function to populate app usage report
+function populateAppUsageReport(activityReport) {
+    const appUsage = activityReport.appUsageLog || [];
+    const detectedApps = activityReport.detectedAppsList || [];
+    
+    if (appUsage.length === 0 && detectedApps.length === 0) {
+        document.getElementById('appUsageReport').innerHTML = '<p>No application usage detected</p>';
+        return;
+    }
+    
+    let html = `
+        <div class="app-summary">
+            <div><strong>Total Apps Detected:</strong> ${detectedApps.length}</div>
+            <div><strong>Suspicious Apps:</strong> ${appUsage.filter(app => app.suspicious).length}</div>
+            <div><strong>App Switches:</strong> ${activityReport.appSwitchCount || 0}</div>
+        </div>
+        <div class="app-list">
+    `;
+    
+    // Group apps by name
+    const apps = {};
+    appUsage.forEach(entry => {
+        if (!apps[entry.appName]) {
+            apps[entry.appName] = {
+                name: entry.appName,
+                suspicious: entry.suspicious,
+                actions: [],
+                totalTime: 0
+            };
+        }
+        apps[entry.appName].actions.push(entry);
+        apps[entry.appName].totalTime += entry.duration;
+    });
+    
+    Object.values(apps).forEach(app => {
+        const suspiciousClass = app.suspicious ? 'suspicious-app' : '';
+        html += `
+            <div class="app-item ${suspiciousClass}">
+                <strong>${escapeHtml(app.name)}</strong>
+                ${app.suspicious ? '<span class="suspicious-badge">SUSPICIOUS</span>' : ''}
+                <div><small>Actions: ${app.actions.length}, Time: ${app.totalTime}s</small></div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    document.getElementById('appUsageReport').innerHTML = html;
+}
+
+// Enhanced copy code function
+function copySubmissionCode() {
+    const codeElement = document.querySelector('#fullCodeDisplay code');
+    if (codeElement) {
+        navigator.clipboard.writeText(codeElement.textContent).then(() => {
+            const button = document.querySelector('.copy-button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '✅ Copied!';
+            button.style.background = '#38a169';
+            
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.style.background = '#3182ce';
+            }, 2000);
+        }).catch(err => {
+            console.error('Failed to copy code:', err);
+            alert('Failed to copy code to clipboard');
+        });
+    }
+}
+
+// Function to close submission detail
+function closeSubmissionDetail() {
+    document.getElementById('submissionDetail').style.display = 'none';
+}
+
+// Helper function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text || '';
+    return div.innerHTML;
+}
+
+// Add some additional CSS for info grid
+const additionalCSS = `
+<style>
+.info-grid {
+    display: grid;
+    gap: 15px;
+}
+
+.info-item {
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.info-value {
+    font-size: 1.1em;
+    color: #2d3748;
+}
+
+.question-full {
+    background: #f7fafc;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 8px;
+    border: 1px solid #e2e8f0;
+    max-height: 150px;
+    overflow-y: auto;
+    line-height: 1.5;
+}
+
+.app-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin-bottom: 15px;
+    padding: 15px;
+    background: #f8fafc;
+    border-radius: 8px;
+}
+
+.app-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.app-item {
+    padding: 10px;
+    margin-bottom: 8px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.app-item.suspicious-app {
+    background: #fed7d7;
+    border-color: #feb2b2;
+}
+
+.suspicious-badge {
+    background: #e53e3e;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 0.8em;
+    margin-left: 8px;
+}
+
+.risk-badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7em;
+    font-weight: bold;
+}
+
+.risk-high {
+    background: #e53e3e;
+    color: white;
+}
+
+.risk-medium {
+    background: #ed8936;
+    color: white;
+}
+
+.risk-low {
+    background: #38a169;
+    color: white;
+}
+</style>
+`;
+
+// Add the additional CSS to the document
+document.head.insertAdjacentHTML('beforeend', additionalCSS);
+
+        async function clearAllTasks() {
+    if (!confirm('Are you sure you want to delete ALL tasks? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        // Delete all tasks
+        const tasksRef = window.firebase.collection(window.firebase.db, 'tasks');
+        const querySnapshot = await window.firebase.getDocs(tasksRef);
+        
+        const deletePromises = querySnapshot.docs.map(doc => 
+            window.firebase.deleteDoc(doc.ref)
+        );
+        await Promise.all(deletePromises);
+        
+        // Delete all submissions
+        const submissionsRef = window.firebase.collection(window.firebase.db, 'submissions');
+        const submissionsSnapshot = await window.firebase.getDocs(submissionsRef);
+        
+        const deleteSubmissionPromises = submissionsSnapshot.docs.map(doc => 
+            window.firebase.deleteDoc(doc.ref)
+        );
+        await Promise.all(deleteSubmissionPromises);
+        
+        // Delete the sample data marker
+        const systemRef = window.firebase.collection(window.firebase.db, 'system');
+        const systemSnapshot = await window.firebase.getDocs(systemRef);
+        
+        const deleteSystemPromises = systemSnapshot.docs.map(doc => 
+            window.firebase.deleteDoc(doc.ref)
+        );
+        await Promise.all(deleteSystemPromises);
+        
+        alert('All tasks cleared successfully!');
+        loadTeacherTasks(); // Refresh the display
+        
+    } catch (error) {
+        console.error('Error clearing tasks:', error);
+        alert('Error clearing tasks: ' + error.message);
+    }
+}
+    </script>
+</body>
+</html>
